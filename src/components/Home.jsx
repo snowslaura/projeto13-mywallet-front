@@ -1,15 +1,53 @@
 import styled from "styled-components"
 import {Link} from "react-router-dom"
+import { useContext, useState, useEffect } from "react";
+import axios from "axios"
+
+import Balance from "./Balance";
+
+import userDataContext from "./../contexts/userDataContext";
+ 
 
 function Home(){
+    const{userData} = useContext(userDataContext)    
+
+    const[balance, setBalance] = useState([])
+    console.log("USER: ", userData)
+    useEffect(() => fetchBalance() ,[])
+
+    function fetchBalance(){
+        console.log("Token: ", userData.token)
+        const config = {
+            headers: {
+                "Authorization": `Bearer ${userData.token}`
+            }
+        }
+
+        const promise = axios.get(`${process.env.REACT_APP_API_URL}/home`, config)
+        promise.then(({data})=>{
+            console.log("DATA: ", data)
+            setBalance(data)
+        }) 
+    }
+   
+    console.log("Balance: ", balance)
     return(
         <Container>
             <Header>
-                <Name>Olá, Fulano</Name>
+                <Name>Olá, {userData.name}</Name>
                 <ion-icon name="log-out-outline"></ion-icon>
             </Header>  
-            <Content>
-                <div><span>Não há registros de</span><span>entrada ou saída</span></div>
+            <Content>                
+                    {!balance?
+                    <div><span>Não há registros de</span><span>entrada ou saída</span></div>:
+                    balance.map((balance)=>{
+                        return(
+                        <Balance 
+                        key={balance.id}
+                        {...balance}
+                        ></Balance>)
+                    })
+                    }                
             </Content>
             <Movements>
                 <Income>

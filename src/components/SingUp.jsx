@@ -1,16 +1,46 @@
 import styled from "styled-components"
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
+import {useContext} from "react"
+import axios from "axios"
+
+import userDataContext from "./../contexts/userDataContext";
 
 function SignUp(){
+    const{userData, setUserData} = useContext(userDataContext)
+
+    const navigate = useNavigate();
+
+    function handleSubmit(event){
+        event.preventDefault()
+
+        const body ={
+            name: userData.name,
+            email:userData.email,
+            password:userData.password,
+            confirmation:userData.confirmation
+        }
+
+        const promise = axios.post(`${process.env.REACT_APP_API_URL}/sign-up`, body)
+        promise.then(()=>{
+            setUserData({...userData,email: ""});
+            setUserData({...userData, password:""});
+            navigate("/");
+
+        })
+        promise.catch((e) => {
+            setUserData({...userData,name:"", email:"", password:"", confirm:""});
+            alert("Dados inválidos");
+        })
+    }
     return(
     <Container> 
-        <form>
+        <form onSubmit={handleSubmit}>
             <Logo>MyWallet</Logo>
-            <input type="text"  placeholder="Nome" />
-            <input type="email"  placeholder="E-mail" />
-            <input type="password" placeholder="Senha"/>
-            <input type="password" placeholder="Confirme a senha"/>
-            <Link to="/"><button type="submit">Registrar</button> </Link>
+            <input type="text" id="name" placeholder="Nome" value={userData.name} onChange={(e)=> setUserData({...userData, name: e.target.value})} />
+            <input type="email" id="email" placeholder="E-mail" value={userData.email} onChange={(e)=> setUserData({...userData, email:e.target.value})}/>
+            <input type="password" id="password" placeholder="Senha" value={userData.password} onChange={(e)=> setUserData({...userData, password:e.target.value})} />
+            <input type="password" id="confirmation" placeholder="Confirme a senha" value={userData.confirmation} onChange={(e)=> setUserData({...userData, confirmation:e.target.value})} />
+            <button type="submit">Registrar</button>
             <Link to="/"><Enter>Já tem uma conta? Entre agora!</Enter></Link>
         </form>           
     </Container>

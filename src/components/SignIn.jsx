@@ -1,14 +1,44 @@
 import styled from "styled-components";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
+ import {useContext} from "react";
+ import axios from "axios"
 
-function SignIn(){  
+import userDataContext from "./../contexts/userDataContext";
+
+
+function SignIn(){ 
+    const {userData, setUserData} = useContext(userDataContext)
+
+    const navigate = useNavigate();
+
+    function handleLogin(event){
+        event.preventDefault();
+        console.log("TON NO LOGIN")
+        const body = {
+            email:userData.email,
+            password:userData.password
+        }
+
+        const promise = axios.post(process.env.REACT_APP_API_URL, body)
+        promise.then(({data})=>{
+            console.log("DATA LOGIN: ", data)
+            setUserData({...userData, token:data})
+            navigate("/home")
+        })
+
+        promise.catch((e)=>{
+            setUserData({...userData,email:"", password:"" , token:""})
+            alert("Login ou senha inválidos")
+        })    
+    }
+    console.log(userData)
     return (
         <Container> 
-            <form>
+            <form onSubmit={handleLogin}>
                 <Logo>MyWallet</Logo>
-                <input type="email"  placeholder="E-mail"  />
-                <input type="password"  placeholder="Senha" />
-                <Link to="/home"><button type="submit">Entrar</button></Link> 
+                <input type="email" id="email" value={userData.email} placeholder="E-mail" onChange={(e)=>setUserData({...userData, email:e.target.value})} />
+                <input type="password" id="password" value={userData.password} placeholder="Senha" onChange={(e)=>setUserData({...userData, password:e.target.value})} />
+                <button type="submit">Entrar</button> 
                 <Link to="/sign-up"><Enter>Primeira vez? Cadastre-se!</Enter></Link>
             </form>           
         </Container>
