@@ -6,7 +6,6 @@ import SignUp from "./SingUp.jsx";
 import Home from "./Home.jsx";
 import Income from "./Income.jsx";
 import Outcome from "./Outcome.jsx";
-import IncomeEdit from "./IncomeEdit.jsx";
 
 import userDataContext from "./../contexts/userDataContext.jsx";
 

@@ -158,7 +158,8 @@ const Content = styled.div`
     background: #FFFFFF;
     border-radius: 5px;
     display: flex;
-    flex-direction:column;    
+    flex-direction:column;
+       
 
     span{
         display:block;        
@@ -172,12 +173,11 @@ const Content = styled.div`
     }
 `
 const Data = styled.div`
-    height: 93%;
+    height: 90%;
     width: 100%;
     display:flex;
     flex-direction: column;
     overflow-y: scroll;
-
 `
 const Message = styled.div`
     margin-top: ${props => props.balance.length===0?"200px":"0"};
@@ -194,6 +194,7 @@ const Total = styled.div`
     flex-direction: row;
     align-items: center;
     justify-content: center;
+    margin-top: 15px;
 
     div{
         display:flex;
@@ -209,7 +210,8 @@ const FinalTotal= styled.p`
     font-weight: 400;
     font-size: 17px;
     line-height: 20px;
-    text-align: right;
+    text-align: right;   
+    max-width:150px;
     color:${props => props.positive===true?"#8FC549":"#C70000"}
 `
 
