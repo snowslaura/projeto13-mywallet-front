@@ -1,17 +1,55 @@
 import styled from "styled-components"
-import { Link } from "react-router-dom";
+import axios from "axios"
+import { useState } from "react"
+import {useNavigate} from "react-router-dom"
+
+
 
 function Income(){
+
+    const[income, setIncome]= useState({})
+    const navigate = useNavigate();
+
+    const userDataLocalStorage = localStorage.getItem("userData")
+    const unserializedData = JSON.parse(userDataLocalStorage)
+    const tokenStorage = unserializedData.token
+    
+    function handleIncome(event){
+        event.preventDefault();
+        const body = {
+            amount: income.amount,
+            description: income.description,
+            type:"income"
+        }     
+
+
+        const config = {
+            headers: {
+                "Authorization": `Bearer ${tokenStorage}`
+            }
+        }
+
+        const promise = axios.post(`${process.env.REACT_APP_API_URL}/home`, body, config)
+        promise.then(()=>{
+            setIncome({});
+            navigate("/home");
+        })
+        promise.catch((e)=>{
+            console.log(e)
+        })
+    }
+     
+
     return(
         <Container> 
             <div>
                 <Header>
                     <Name>Nova entrada</Name>
                 </Header>  
-                <form>
-                    <input type="value"  placeholder="Valor"  />
-                    <input type="text"  placeholder="Descrição" />
-                    <Link to="/home"><button type="submit">Salvar entrada</button></Link>
+                <form onSubmit={handleIncome}>
+                    <input type="number" min="0.01" max="100000.00" step="0.01" id="amount" value={income.amount} placeholder="Valor" onChange={(e)=> setIncome({...income, amount: e.target.value})}/>
+                    <input type="text" id="description" maxLength="20" value={income.description} placeholder="Descrição" onChange={(e)=> setIncome({...income, description: e.target.value})} />
+                    <button type="submit">Salvar entrada</button>
                 </form> 
             </div>                      
         </Container>
@@ -42,13 +80,18 @@ const Container = styled.div`
         background: #FFFFFF;
         border-radius: 5px;
         margin-top: 13px;
+        font-style: normal;
+        font-weight: 400;
+        font-size: 20px;
+        line-height: 23px;
+        padding: 10px;
+        color: #000000;
         ::placeholder {
                         color:#000000;
                         font-style: normal;
                         font-weight: 400;
                         font-size: 20px;
                         line-height: 23px;
-                        padding: 10px;
                     };  
     }
 

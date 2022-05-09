@@ -13,7 +13,6 @@ function SignIn(){
 
     function handleLogin(event){
         event.preventDefault();
-        console.log("TON NO LOGIN")
         const body = {
             email:userData.email,
             password:userData.password
@@ -21,8 +20,10 @@ function SignIn(){
 
         const promise = axios.post(process.env.REACT_APP_API_URL, body)
         promise.then(({data})=>{
-            console.log("DATA LOGIN: ", data)
-            setUserData({...userData, token:data})
+            //setUserData({...userData, token:data.token,name:data.name})
+            //console.log(userData)
+            const serializedDataString = JSON.stringify({token: data.token, name:data.name})            
+            localStorage.setItem("userData", serializedDataString)
             navigate("/home")
         })
 
@@ -31,7 +32,6 @@ function SignIn(){
             alert("Login ou senha inválidos")
         })    
     }
-    console.log(userData)
     return (
         <Container> 
             <form onSubmit={handleLogin}>
@@ -76,13 +76,18 @@ const Container = styled.div`
         background: #FFFFFF;
         border-radius: 5px;
         margin-top: 13px;
+        font-style: normal;
+        font-weight: 400;
+        font-size: 20px;
+        line-height: 23px;
+        padding: 10px;
+        color: #000000;
         ::placeholder {
                         color:#000000;
                         font-style: normal;
                         font-weight: 400;
                         font-size: 20px;
                         line-height: 23px;
-                        padding: 10px;
                     };  
     }
 

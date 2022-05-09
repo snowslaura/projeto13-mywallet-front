@@ -1,53 +1,105 @@
 import styled from "styled-components"
-import {Link} from "react-router-dom"
-import { useContext, useState, useEffect } from "react";
+import {Link, useNavigate} from "react-router-dom"
+import { useState, useEffect } from "react";
 import axios from "axios"
 
-import Balance from "./Balance";
-
-import userDataContext from "./../contexts/userDataContext";
- 
+import Balance from "./Balance"; 
 
 function Home(){
-    const{userData} = useContext(userDataContext)    
 
-    const[balance, setBalance] = useState([])
-    console.log("USER: ", userData)
+    const userDataLocalStorage = localStorage.getItem("userData")
+    const unserializedData = JSON.parse(userDataLocalStorage)
+    const tokenStorage = unserializedData.token
+    const nameStorage = unserializedData.name
+
+    const[balance, setBalance] = useState([]);
+    const[total, setTotal] = useState(0);
+    const[positive,setPositive]=useState(true)
+
+    const navigate = useNavigate()
+
     useEffect(() => fetchBalance() ,[])
 
     function fetchBalance(){
-        console.log("Token: ", userData.token)
         const config = {
             headers: {
-                "Authorization": `Bearer ${userData.token}`
+                "Authorization": `Bearer ${tokenStorage}`
             }
         }
 
         const promise = axios.get(`${process.env.REACT_APP_API_URL}/home`, config)
         promise.then(({data})=>{
-            console.log("DATA: ", data)
             setBalance(data)
-        }) 
+            calculateTotal(data);            
+        })
+        promise.catch((e)=>{
+            console.log(e)
+        })
     }
+
+
+
+    function handleLogOut(){
+        const config = {
+            headers: {
+                "Authorization": `Bearer ${tokenStorage}`
+            }
+        }
+
+        const body = {};
+
+        const promise = axios.put(`${process.env.REACT_APP_API_URL}/home`, body, config)
+        promise.then(()=>{
+            navigate("/")
+        })
+        promise.catch((e)=>{
+            console.log(e)
+        })
+    }
+
+    function calculateTotal(balance){
+        const totalAmount = balance?.map((element)=> {
+            if(element.type === "income"){
+                return +element.amount
+            }else if(element.type === "outcome"){
+                return -element.amount
+            }
+        })
+        
+        if(totalAmount.length!==0){
+            const calc = totalAmount?.reduce(sum)
+            if(calc>0)setPositive(true)
+            else setPositive(false) 
+            setTotal(calc)   
+        }      
+        
+    }
+
+    function sum(total,num){
+       return total + num      
+    }
+
+    const editedTotal = parseInt(total).toFixed(2)
+    const totalEdited = editedTotal.toString().replace(".", ",")
    
-    console.log("Balance: ", balance)
     return(
         <Container>
             <Header>
-                <Name>Olá, {userData.name}</Name>
-                <ion-icon name="log-out-outline"></ion-icon>
+                <Name>Olá, {nameStorage}</Name>
+                <ion-icon onClick={handleLogOut} name="log-out-outline"></ion-icon>
             </Header>  
-            <Content>                
-                    {!balance?
-                    <div><span>Não há registros de</span><span>entrada ou saída</span></div>:
-                    balance.map((balance)=>{
-                        return(
-                        <Balance 
-                        key={balance.id}
-                        {...balance}
-                        ></Balance>)
-                    })
-                    }                
+            <Content>
+                    <Data>
+                        {balance.length===0?
+                        <Message balance={balance}><span>Não há registros de</span><span>entrada ou saída</span></Message>:
+                        balance.map((balance)=>{
+                            return(
+                            <Balance key={balance.id} {...balance}></Balance>)})
+                        }
+                    </Data>            
+                     
+                    {balance.length===0?"":
+                    <Total><div><p>SALDO</p><FinalTotal positive={positive}>{totalEdited}</FinalTotal></div></Total>}
             </Content>
             <Movements>
                 <Income>
@@ -69,17 +121,10 @@ function Home(){
 
 export default Home;
 const Container = styled.div` 
-     
     display:flex;
     flex-direction: column;
     align-items: center;
-   
 
-    ion-icon{
-        color: #FFFFFF;
-        font-size: 30px;
-    }
-    
 `
 
 const Header = styled.div`
@@ -92,6 +137,11 @@ const Header = styled.div`
     margin-top: 0;
     margin-bottom: 0;
     height: 60px;    
+
+    ion-icon{
+        color: #fff;
+        font-size: 30px;
+    }
 `
 
 const Name = styled.p`
@@ -108,9 +158,7 @@ const Content = styled.div`
     background: #FFFFFF;
     border-radius: 5px;
     display: flex;
-    justify-content: center;
-    align-items: center;
-    
+    flex-direction:column;    
 
     span{
         display:block;        
@@ -122,6 +170,47 @@ const Content = styled.div`
         color: #868686;
 
     }
+`
+const Data = styled.div`
+    height: 93%;
+    width: 100%;
+    display:flex;
+    flex-direction: column;
+    overflow-y: scroll;
+
+`
+const Message = styled.div`
+    margin-top: ${props => props.balance.length===0?"200px":"0"};
+`
+
+const Total = styled.div`
+    font-style: normal;
+    font-weight: 700;
+    font-size: 17px;
+    line-height: 20px;
+    color: #000000;
+    width:100%;    
+    display:flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: center;
+
+    div{
+        display:flex;
+        flex-direction:row;
+        align-items: center;
+        justify-content: space-between;
+        width: 95%;
+    }
+`
+
+const FinalTotal= styled.p`
+    font-style: normal;
+    font-weight: 400;
+    font-size: 17px;
+    line-height: 20px;
+    text-align: right;
+    color:${props => props.positive===true?"#8FC549":"#C70000"}
 `
 
 const Movements = styled.div`
@@ -143,6 +232,8 @@ const Income = styled.div`
     ion-icon{
         margin-left: 10px;
         margin-top: 10px;
+        color: #fff;
+        font-size: 30px;
     }
 
     div{
@@ -173,6 +264,8 @@ const Outcome = styled.div`
     ion-icon{
         margin-left: 10px;
         margin-top: 10px;
+        color: #fff;
+        font-size: 30px;
     }
     div{
         margin-left: 10px;

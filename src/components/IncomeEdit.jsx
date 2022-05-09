@@ -4,21 +4,22 @@ import { useState } from "react"
 import {useNavigate} from "react-router-dom"
 
 
-function Outcome(){
 
-    const[income, setIncome]= useState({})
+function IncomeEdit(){
+
+    const[editIncome, setEditIncome]= useState({})
     const navigate = useNavigate();
 
     const userDataLocalStorage = localStorage.getItem("userData")
     const unserializedData = JSON.parse(userDataLocalStorage)
     const tokenStorage = unserializedData.token
-
-    function handleOutcome(event){
+    
+    function handleEdition(event){
         event.preventDefault();
         const body = {
-            amount: income.amount,
-            description: income.description,
-            type:"outcome"
+            amount: editIncome.amount,
+            description: editIncome.description,
+            type:"income"
         }     
 
 
@@ -28,53 +29,57 @@ function Outcome(){
             }
         }
 
-        const promise = axios.post(`${process.env.REACT_APP_API_URL}/home`, body, config)
+        const promise = axios.post(`${process.env.REACT_APP_API_URL}/home:id`, body, config)
         promise.then(()=>{
-            setIncome({});
+            setEditIncome({});
             navigate("/home");
         })
         promise.catch((e)=>{
             console.log(e)
         })
     }
-    return(        
-        <Container>
+     
+
+    return(
+        <Container> 
             <div>
                 <Header>
-                    <Name>Nova saída</Name>
+                    <Name>Editar entrada</Name>
                 </Header>  
-                <form onSubmit={handleOutcome}>
-                    <input type="number" min="0.01" max="999999.00" step="0.01" id="amount" value={income.amount} placeholder="Valor" onChange={(e)=> setIncome({...income, amount: e.target.value})}/>
-                    <input type="text" id="description" maxLength="20" value={income.description} placeholder="Descrição" onChange={(e)=> setIncome({...income, description: e.target.value})} />
-                    <button type="submit">Salvar entrada</button>
+                <form onSubmit={handleEdition}>
+                    <input type="number" id="amount" maxLength="6" value={editIncome.amount} placeholder="Valor" onChange={(e)=> setEditIncome({...editIncome, amount: e.target.value})}/>
+                    <input type="text" id="description" value={editIncome.description} placeholder="Descrição" onChange={(e)=> setEditIncome({...editIncome, description: e.target.value})} />
+                    <button type="submit">Atualizar entrada</button>
                 </form> 
-            </div>                     
-        </Container>        
+            </div>                      
+        </Container>
     )
 }
 
-export default Outcome;
+export default IncomeEdit;
 
-const Container = styled.div` 
-    display: flex;
-    flex-direction: column; 
-    justify-content: center;
-    align-items: center;
+const Container = styled.div`
 
-    form{
         display: flex;
         flex-direction: column; 
         justify-content: center;
-        align-items: center; 
-        margin-top: 20px;             
+        align-items: center;
+   
+
+   form{
+        display: flex;
+        flex-direction: column; 
+        justify-content: center;
+        align-items: center;   
+        margin-top: 20px;       
     }
 
-    input{ 
+   input{ 
         width: 326px;
         height: 58px;
         background: #FFFFFF;
         border-radius: 5px;
-        margin-top: 3%;
+        margin-top: 13px;
         font-style: normal;
         font-weight: 400;
         font-size: 20px;
@@ -95,7 +100,7 @@ const Container = styled.div`
         height: 46px;
         background: #A328D6;
         border-radius: 5px;
-        margin-top: 3%;
+        margin-top: 13px;
         font-style: normal;
         font-weight: 700;
         font-size: 20px;
@@ -104,6 +109,7 @@ const Container = styled.div`
         border:none;
     }
 `
+
 const Header = styled.div`
     width: 326px;
     display: flex;
@@ -123,6 +129,7 @@ const Name = styled.p`
     line-height: 31px;
     color: #FFFFFF;
 `
+
 
 
 

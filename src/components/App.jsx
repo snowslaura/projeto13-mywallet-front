@@ -6,6 +6,7 @@ import SignUp from "./SingUp.jsx";
 import Home from "./Home.jsx";
 import Income from "./Income.jsx";
 import Outcome from "./Outcome.jsx";
+import IncomeEdit from "./IncomeEdit.jsx";
 
 import userDataContext from "./../contexts/userDataContext.jsx";
 
@@ -21,7 +22,7 @@ function App(){
                         <Route path="/" element={<SignIn/>}/>
                         <Route path="/sign-up" element={<SignUp/>}/>
                         <Route path="/home" element={<Home/>}/>
-                        <Route path="/income" element={<Income/>}/>
+                        <Route path="/income" element={<Income/>}/>                        
                         <Route path="/outcome" element={<Outcome/>}/>
                     </Routes>  
             </userDataContext.Provider>                      

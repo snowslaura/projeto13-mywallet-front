@@ -22,8 +22,9 @@ function SignUp(){
 
         const promise = axios.post(`${process.env.REACT_APP_API_URL}/sign-up`, body)
         promise.then(()=>{
+            setUserData({...userData,name:"", email:"", password:"", confirm:""});
             setUserData({...userData,email: ""});
-            setUserData({...userData, password:""});
+            setUserData({...userData, password:""});            
             navigate("/");
 
         })
@@ -77,14 +78,19 @@ const Container = styled.div`
         height: 58px;
         background: #FFFFFF;
         border-radius: 5px;
-        margin-bottom: 13px;  
+        margin-bottom: 13px;
+        font-style: normal;
+        font-weight: 400;
+        font-size: 20px;
+        line-height: 23px;
+        padding: 10px;
+        color: #000000;  
         ::placeholder {
                         color:#000000;
                         font-style: normal;
                         font-weight: 400;
                         font-size: 20px;
                         line-height: 23px;
-                        padding: 10px;
                     };      
     }
 
