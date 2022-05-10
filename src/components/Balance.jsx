@@ -1,7 +1,7 @@
 import styled from "styled-components"
 
 function Balance({date, type, amount, description}){  
-    const editedAmount = parseInt(amount).toFixed(2)
+    const editedAmount = parseFloat(amount).toFixed(2)
     const amountEdited = editedAmount.toString().replace(".", ",")
     
     return(
