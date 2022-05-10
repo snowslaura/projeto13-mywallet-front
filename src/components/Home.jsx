@@ -79,7 +79,7 @@ function Home(){
        return total + num      
     }
 
-    const editedTotal = parseInt(total).toFixed(2)
+    const editedTotal = parseFloat(total).toFixed(2)
     const totalEdited = editedTotal.toString().replace(".", ",")
    
     return(
